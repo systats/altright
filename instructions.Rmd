@@ -63,7 +63,7 @@ Let us first thank you personally for participating in this project. It's great 
 
 **What is the Goal of this Project?**
 
-The goal of this project is to track the Alt Right on various Social Media platforms (Facebook, Twitter and YouTube). We seek to identify their content, talking points and narratives by applying machine learning algorithms and natural language processing such as sentiment analysis and topic modeling. In order to do this we accumulated a data set of \textit{over 15 Million comments and tweets posted online during the entire year of 2017} from Social Media accounts that are associated with the Alt Right. 
+The goal of this project is to track the Alt Right on various Social Media platforms (Facebook, Twitter and YouTube). We seek to identify their content, talking points and narratives by applying machine learning algorithms and natural language processing such as sentiment analysis and topic modeling. In order to do this we accumulated a data set of *over 15 Million comments and tweets posted online during the entire year of 2017* from Social Media accounts that are associated with the Alt Right. 
 
 \vspace{5pt}
 
@@ -104,11 +104,9 @@ knitr::include_graphics(here::here("images", "type_of_language.png"))
 
 ### Vulgar Language
  
-> Text includes swearwords, personal insults or cursing.
+Text includes swearwords, personal insults or cursing.
 
-\begin{mybox}{Example for \emph{Vulgar Language}}
-Get the fuck outta here talking bout the response will be better. You fucking ignorant stupid asshole.
-\end{mybox}
+> Example for *Vulgar Language: * Get the fuck outta here talking bout the response will be better. You fucking ignorant stupid asshole.
   
 ### Hostile Language
  
@@ -120,7 +118,7 @@ Because mudslimes are mudslimes for a reason. When you let mudslimes into your c
 
 ### Call for Violence
 
-> Text includes a call to act out violence against a certain group of people (especially when based on their race, religion and/or gender). This includes endorsing to kill or injure, mass deport, forcefully evict and/or segregate them.
+Text includes a call to act out violence against a certain group of people (especially when based on their race, religion and/or gender). This includes endorsing to kill or injure, mass deport, forcefully evict and/or segregate them.
 
 \begin{mybox}{Example for \emph{Call for Violence}}
 Deport all immigrants who refuse to be deported or kill them if they resist this is literally the law.

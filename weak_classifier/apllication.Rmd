@@ -1,0 +1,103 @@
+---
+title: "Predict on unseen data"
+output: html_notebook
+---
+
+
+## packages
+
+```{r}
+pacman::p_load(dplyr, ggplot2, googlesheets, openxlsx, stringr, rvest, dplyr, ggplot2, h2o, caret, text2vec)
+```
+
+
+## load data
+
+```{r}
+df <- get(load("sub_sample2.Rdata"))
+```
+
+
+## clean 
+
+```{r}
+clean_social_media <- function(x){
+
+  x %>%
+    str_replace_all("\n", " ") %>%
+    str_to_lower() %>%
+    ### Twitter specific
+    str_replace_all("https?[:]//[[:graph:]]+", "URL") %>%
+    str_replace_all("@(\\w+)", " HNDL") %>%
+    str_replace_all("#(\\w+)", " HASH") %>%
+    ### ALtright replacements
+    str_replace_all("\\(+.?", "JEW ") %>%
+    str_replace_all("\\)+", " ") %>%
+    ### smilies
+    str_replace_all(":-\\)|:\\)|\\(:|\\(-:", " EMO_SMILEY ") %>%
+    str_replace_all(":-D|:D|X-D|XD|xD", " EMO_LAUGH ") %>%
+    str_replace_all("<3|:\\*", "EMO_LOVE") %>%
+    str_replace_all(";-\\)|;\\)|;-D|;D|\\(;|\\(-;", "EMO_WINK") %>%
+    str_replace_all(":-\\(|:\\(|\\):|\\)-:", "EMO_FROWN") %>%
+    str_replace_all(':,\\(|:"\\(|:\\(\\(', "EMO_CRY") %>%
+    ### General
+    str_replace_all("\\.|\\:|\\;", " PUNC_DOT ") %>%
+    str_replace_all("\\!", " PUNC_EXCL ") %>%
+    str_replace_all("\\?", " PUNC_QUES ") %>%
+    str_replace_all("\\.\\.\\.", " PUNC_DOTS ") %>%
+    ### White Space
+    str_replace_all("\\s+", " ") %>%
+    str_trim() 
+}
+
+
+df <- df %>%
+  mutate(ctext = clean_social_media(text))
+```
+
+
+
+## vectorize
+
+```{r}
+load("vectorizer.Rdata")
+### test
+pred_it <- itoken(
+  df$ctext, 
+  ids = df$id,
+  progressbar = F
+)
+
+pred_dtm <- create_dtm(pred_it, vectorizer)
+```
+
+
+## predict
+
+```{r}
+library(h2o)
+### initialize an h2o instance
+h2o.init(nthreads = -1)
+gbm_base <- h2o.loadModel("GBM_model_R_1518041392676_1")
+# devtools::install_github("h2oai/h2o-3/h2o-r/ensemble/h2oEnsemble-package")
+h2o_pred <- as.h2o(pred_dtm)
+pred1 <- h2o.predict(gbm_base, h2o_pred) %>%
+  as.data.frame()
+
+df_pred <- data.frame(df, pred1)
+
+
+df_pred <- df_pred %>% 
+  filter(predict == 1) %>% 
+  mutate(sp = ntile(id, n = 10)) %>% 
+  arrange(ran = rnorm(n())) 
+# 
+# for(jj in 1:10){
+#   save(df_pred %>% filter(sp == jj), file = "")
+# }
+
+df_list <- df_pred %>% split(., .[,"sp"])
+save(df_list, file = "df_list.Rdata")
+```
+
+

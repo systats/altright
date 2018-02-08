@@ -1,0 +1,305 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+pacman::p_load(dplyr, ggplot2, googlesheets, openxlsx, stringr, rvest, dplyr, ggplot2)
+```
+
+
+```{r}
+#gs_auth()
+with_label_id <- gs_title("altright_final")
+alright_label <- gs_read(with_label_id)
+```
+
+
+```{r}
+alright_label %>% glimpse
+```
+
+```{r}
+alright_label %>% 
+  select(identity:anti_mus) %>%
+  purrr::map(table)
+```
+
+```{r}
+clean_slider <- function(x){
+  x %>%
+    str_replace_all("Not Present", "1") %>%
+    str_replace_all("Strongly Present", "5")
+}
+
+clean_social_media <- function(x){
+
+  x %>%
+    str_replace_all("\n", " ") %>%
+    str_to_lower() %>%
+    ### Twitter specific
+    str_replace_all("https?[:]//[[:graph:]]+", "URL") %>%
+    str_replace_all("@(\\w+)", " HNDL") %>%
+    str_replace_all("#(\\w+)", " HASH") %>%
+    ### ALtright replacements
+    str_replace_all("\\(+.?", "JEW ") %>%
+    str_replace_all("\\)+", " ") %>%
+    ### smilies
+    str_replace_all(":-\\)|:\\)|\\(:|\\(-:", " EMO_SMILEY ") %>%
+    str_replace_all(":-D|:D|X-D|XD|xD", " EMO_LAUGH ") %>%
+    str_replace_all("<3|:\\*", "EMO_LOVE") %>%
+    str_replace_all(";-\\)|;\\)|;-D|;D|\\(;|\\(-;", "EMO_WINK") %>%
+    str_replace_all(":-\\(|:\\(|\\):|\\)-:", "EMO_FROWN") %>%
+    str_replace_all(':,\\(|:"\\(|:\\(\\(', "EMO_CRY") %>%
+    ### General
+    str_replace_all("\\.|\\:|\\;", " PUNC_DOT ") %>%
+    str_replace_all("\\!", " PUNC_EXCL ") %>%
+    str_replace_all("\\?", " PUNC_QUES ") %>%
+    str_replace_all("\\.\\.\\.", " PUNC_DOTS ") %>%
+    ### White Space
+    str_replace_all("\\s+", " ") %>%
+    str_trim() 
+}
+
+# need_transform <- function(x) return(any(str_detect(x, "Present")))
+# need_transform(c("Prsdbbd", "jsdfj", "Present"))
+
+cdat <- alright_label %>%
+  purrr::map_df(clean_slider) %>%
+  mutate(ctext = clean_social_media(text))
+
+allslider <- rowSums(cdat %>%
+  select(identity:left, anti_fem:anti_mus) %>%
+  mutate_all(as.numeric) %>%
+  mutate_all(function(x) x - 1 )) 
+
+allbutton <- rowSums(cdat %>% 
+  select(imm, vict) %>%
+  mutate_all(function(x) ifelse(x == "99", 0, as.numeric(x))))
+
+cdat$target <- ifelse(allslider > 0 | allbutton > 0, 1, 0)
+table(cdat$target)
+
+
+cdat %>%
+  group_by(page) %>%
+  tally
+```
+
+# Train/ Test
+
+```{r}
+set.seed(2018)
+prop <- floor(nrow(cdat)*.8)
+train_id <- sample(cdat$id, size = prop)
+test_id <- setdiff(cdat$id, train_id)
+
+train_df <- cdat %>% filter(id %in% train_id)
+test_df <- cdat %>% filter(id %in% test_id)
+table(test_df$target)
+```
+
+
+```{r}
+#devtools::install_github("dselivanov/text2vec")
+library(text2vec)
+
+train_it <- itoken(
+  train_df$ctext, 
+  ids = train_df$id,
+  progressbar = F
+)
+
+vocab <- create_vocabulary(train_it)
+vectorizer <- vocab_vectorizer(vocab)
+#save(vectorizer, file = "vectorizer.Rdata")
+train_dtm <- create_dtm(train_it, vectorizer)
+
+### test
+test_it <- itoken(
+  test_df$ctext, 
+  ids = test_df$id,
+  progressbar = F
+)
+
+test_dtm <- create_dtm(test_it, vectorizer)
+
+words <- strsplit(train_df$ctext, "\\s+")
+train_df$nword <- words %>% purrr::map_int(length)
+
+dim(train_dtm)
+dim(test_dtm)
+# dtm_crop_mat <- dtm_crop %>% 
+#   as.matrix()
+# 
+# glimpse(dtm_crop_mat)
+```
+
+
+## Train/test Data
+
+```{r}
+library(h2o)
+
+### predictions
+# demo(h2o.deeplearning) 
+# devtools::install_github("h2oai/h2o-3/h2o-r/ensemble/h2oEnsemble-package")
+
+### initialize an h2o instance
+h2o.init(nthreads = -1) # -1 all cpu's, -2 default
+# h2o.no_progress() # disable progress bar 
+set.seed(2018)
+
+### disconnect from server
+# h2o.shutdown(prompt = FALSE)
+
+h2o_train <- as.h2o(train_dtm)
+h2o_test <- as.h2o(test_dtm)
+
+vars <- train_df %>% 
+  select(target) %>% 
+  mutate(target = factor(target, levels = c(0, 1))) %>%
+  as.h2o()
+
+data <- h2o.cbind(vars, h2o_train)
+
+# specify input and output features
+output <- "target" 
+input  <- setdiff(h2o::colnames(data), output)
+
+data.split <- h2o.splitFrame(data, .8, seed = 1234)
+train <- h2o.assign(data.split[[1]], "train" ) # 60%
+valid <- h2o.assign(data.split[[2]], "valid" ) # 20%
+#test  <- h2o.assign(data.split[[3]], "test" )  # 20%
+```
+
+
+```{r}
+gbm_base <- h2o.gbm(
+  x = input, 
+  y = output, 
+  training_frame = train, 
+  validation_frame = valid, 
+  distribution = "bernoulli"
+)
+```
+
+```{r}
+h2o.performance(gbm_base)
+#h2o.saveModel(gbm_base, path = ".")
+pred1 <- h2o.predict(gbm_base, h2o_test) %>%
+  as.data.frame()
+
+con_mat1 <- data.frame(pred = pred1$predict, real = test_df$target, text = test_df$text) 
+#save(con_mat1, file = "gbm_predition_data.Rdata")
+caret::confusionMatrix(con_mat1$pred, con_mat1$real)
+```
+
+
+## RF
+
+```{r}
+h2o_rf <- h2o.randomForest(
+  x = input, 
+  y = output, 
+  training_frame = train, 
+  validation_frame = valid, 
+  distribution = "bernoulli"
+)
+```
+
+```{r}
+h2o.performance(h2o_rf)
+
+pred1 <- h2o.predict(h2o_rf, h2o_test) %>%
+  as.data.frame()
+
+caret::confusionMatrix(pred1$predict, test_df$target)
+```
+
+## XGBOOST
+
+```{r}
+#h2o.xgboost.available()
+h2o_xg <- h2o.xgboost(
+  x = input, 
+  y = output,
+  training_frame = train, 
+  validation_frame = valid, 
+  distribution = "bernoulli"
+)
+
+pred1 <- h2o.predict(h2o_xg, h2o_test) %>%
+  as.data.frame()
+
+caret::confusionMatrix(pred1$predict, test_df$target)
+```
+
+## DNN 
+
+```{r}
+h2o_dn1 <- h2o.deeplearning(
+  x = input, 
+  y = output, hidden = c(90, 40), 
+  activation = "Rectifier",
+  training_frame = train, 
+  validation_frame = valid, 
+  distribution = "bernoulli"
+)
+```
+
+```{r}
+h2o.performance(h2o_dn1)
+
+pred1 <- h2o.predict(h2o_dn1, h2o_test) %>%
+  as.data.frame()
+
+
+cbind(pred1, test_df) %>%
+  filter(predict == 1)
+
+caret::confusionMatrix(pred1$predict, test_df$target)
+# nn <- final_dat[401:nrow(final_dat), ] 
+# nn[(which(as.data.frame(pred1)$p1 > .1)), ]
+```
+
+```{r}
+library(randomForest)
+model <- randomForest(is_duplicate ~ ., data = tr)
+pred <- predict(model, newdata = tr,  type="prob")
+
+```
+
+
+```{r, eval = F}
+library(kerasR)
+library(reticulate)
+
+
+X_train <- pad_sequences(final_dat$text[1:400], maxlen = 50)
+Y_train <- final_dat$text[1:400]
+X_test <- pad_sequences(final_dat$text[401:nrow(final_dat)], maxlen = 50)
+Y_test <- final_dat$text[401:nrow(final_dat)]
+
+mod <- Sequential()
+
+mod$add(
+  Embedding(500, 32, 
+    input_length = 100, 
+    input_shape = c(100))
+  )
+mod$add(Dropout(0.25))
+
+mod$add(Flatten())
+
+mod$add(Dense(256))
+mod$add(Dropout(0.25))
+mod$add(Activation('relu'))
+
+mod$add(Dense(1))
+mod$add(Activation('sigmoid'))
+```
+
+
+

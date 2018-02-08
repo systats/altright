@@ -14,7 +14,7 @@ pacman::p_load(dplyr, ggplot2, googlesheets, openxlsx, stringr, rvest, dplyr, gg
 ## load data
 
 ```{r}
-df <- get(load("sub_sample2.Rdata"))
+df <- get(load("sub_sample3.Rdata"))
 ```
 
 
@@ -78,25 +78,64 @@ pred_dtm <- create_dtm(pred_it, vectorizer)
 library(h2o)
 ### initialize an h2o instance
 h2o.init(nthreads = -1)
-gbm_base <- h2o.loadModel("GBM_model_R_1518041392676_1")
+gbm_base <- h2o.loadModel("GBM_model_R_1518041392676_57")
 # devtools::install_github("h2oai/h2o-3/h2o-r/ensemble/h2oEnsemble-package")
 h2o_pred <- as.h2o(pred_dtm)
 pred1 <- h2o.predict(gbm_base, h2o_pred) %>%
   as.data.frame()
 
-df_pred <- data.frame(df, pred1)
-
-
-df_pred <- df_pred %>% 
+df_pred1 <- data.frame(df, pred1) %>% 
   filter(predict == 1) %>% 
   mutate(sp = ntile(id, n = 10)) %>% 
   arrange(ran = rnorm(n())) 
-# 
-# for(jj in 1:10){
-#   save(df_pred %>% filter(sp == jj), file = "")
-# }
 
-df_list <- df_pred %>% split(., .[,"sp"])
+### select a variety of inter coder text examples
+with_label_id <- gs_title("altright_final")
+alright_label <- gs_read(with_label_id)
+
+work <- alright_label %>% 
+  select(identity:anti_sem)
+
+set.seed(2018)
+vec_all<- c()
+for (jj in seq_along(work)) {
+  obj <- work[[jj]]
+  u_var <- unique(obj)
+  for (ii in seq_along(u_var)) {
+    index <- obj == u_var[ii]
+    vec <- sample((1:length(obj))[index], 2)
+    vec_all <- append(vec_all, vec)
+  }
+  print(jj)
+}
+
+vec_final <- vec_all[!is.na(vec_all)]
+vec_final <- vec_final[!duplicated(vec_final)]
+vec_final <- append(vec_final, 997)
+vec_final <- append(vec_final, 61)
+inter_coder_dat <- alright_label[vec_final,]
+save(inter_coder_dat, file = "inter_coder_dat.Rdata")
+inter_coder_dat <- inter_coder_dat %>% select(user:nchar)
+
+### draw a sample 30 times and add the inter coder test text
+
+df_filter <- df_pred %>% 
+  select(user:nchar) %>%
+  sample_n(size = 30000) %>%
+  mutate(sp = ntile(rnorm(length(id)), 30))
+
+df_list <- list()
+for(jj in seq_along(unique(df_filter$sp))){
+  temp <- df_filter[df_filter$sp == jj,] %>%
+    select(-sp)
+  
+  df_list[[jj]] <- rbind(inter_coder_dat, temp)
+}
+
+df_list[[1]]
+length(df_list)
+
+#  split(., .[,"sp"])
 save(df_list, file = "df_list.Rdata")
 ```
 

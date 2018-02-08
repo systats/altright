@@ -1,6 +1,7 @@
 label_altright_UI <- function(id){
   ns <- NS(id)
   shiny.semantic::semanticPage(
+    useShinyjs(),
     #shinythemes::themeSelector(),
     column(width = 3,
       div(class="ui blue segment",
@@ -72,7 +73,7 @@ label_altright_UI <- function(id){
           div(
             class = "small circular ui icon button",
             `data-inverted` = "",
-            `data-tooltip` = "Identifiying 'the Left/Liberals' as the main problem",
+            `data-tooltip` = "Negative sentiment towards liberals or “the Left” as a whole",
             `data-variation` = "wide",
             `data-position` = "top right",
             uiicon("help")
@@ -117,15 +118,15 @@ label_altright_UI <- function(id){
         #   )
         # )
       ),
-      br(),
       div(class = "ui three column grid", 
         div(class="column",
+          br(),
           span(
             strong("1. Type of Language", style = "font-size: 15px;"), 
             div(
               class = "small circular ui icon button", 
               `data-inverted` = "",
-              `data-tooltip` = "Here we want to measure the OVERALL negativity/ positivity of a tweet. This is not entity/bitcoin specific but wholistic.",
+              `data-tooltip` = "Please select only one.",
               `data-variation` = "wide",
               `data-position` = "top right",
               uiicon("help")
@@ -142,12 +143,13 @@ label_altright_UI <- function(id){
           )
         ),
         div(class="column",
+          br(),
           span(
             strong("2. Anti-Immigration", style = "font-size: 15px;"), 
             div(
               class = "small circular ui icon button", 
               `data-inverted` = "",
-              `data-tooltip` = "Here we want to measure the OVERALL negativity/ positivity of a tweet. This is not entity/bitcoin specific but wholistic.",
+              `data-tooltip` = "Please select one or more items.",
               `data-variation` = "wide",
               `data-position` = "top right",
               uiicon("help")
@@ -164,12 +166,13 @@ label_altright_UI <- function(id){
           )
         ),
         div(class="column",
+          br(),
           span(
             strong("3. Victimization", style = "font-size: 15px;"), 
             div(
               class = "small circular ui icon button", 
               `data-inverted` = "",
-              `data-tooltip` = "Here we want to measure the OVERALL negativity/ positivity of a tweet. This is not entity/bitcoin specific but wholistic.",
+              `data-tooltip` = "Please select one or more items.",
               `data-variation` = "wide",
               `data-position` = "top right",
               uiicon("help")
@@ -179,46 +182,51 @@ label_altright_UI <- function(id){
             inputId = ns("vict"), 
             label = "", 
             selected = "99",
-            choices = c(`in General` = "1",
-                        `being White` = "2", 
-                        `being Male` = "3",
+            choices = c(`In General` = "1",
+                        `For being White` = "2", 
+                        `For being Male` = "3",
                         `None of the Above` = "99")
           )
         )
       ),
+      br(),
       div(class = "ui two column grid",
         div(class = "column",
+          br(),
           span(
-            strong("4. Irony or Sarcasm", style = "font-size: 15px;"), 
+            strong("4. Irony or Trolling", style = "font-size: 15px;"), 
             div(
               class = "small circular ui icon button", 
               `data-inverted` = "",
-              `data-tooltip` = "If this tweet is advertisment or does promote any products its SPAM. Otherwise HAM.",
+              `data-tooltip` = "Please Select",
               `data-variation` = "wide",
-              `data-position` = "top left",
+              `data-position` = "top right",
               uiicon("help") 
             )
           ),
           switchInput(
             inputId = ns("irony"), 
             value = F, 
-            label = "Irony?",
+            label = "",
             offStatus = "warning", 
             onStatus = "success", 
             offLabel = "No",
             onLabel = "Yes"
           )
         ),
-        div(class = "column", 
+        div(class = "right aligned column", 
             br(),
-            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                numericInput(ns("select"), label = NULL, value = 1, min = 1) # starts at 0 due to observe event | bug
+            br(),
+            div(style="float: right;width: 150px;",
+                actionButton(ns("submit"), label = "Submit", icon = icon("check"), style="color: #fff; background-color: green; border-color: #2e6da4")
             ),
-            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                actionButton(ns("submit"), label = "Submit Coding", icon = icon("cloud"))
+            br(),
+            div(style="float: right;",
+              strong(textOutput(ns("counter")))
             )
         )
       )
+      #progressBar(id = ns("pb"), value = 1, status = "success")
     ),
     # bhvhv
     column(width = 3,
@@ -306,6 +314,9 @@ label_altright_UI <- function(id){
                       "2", "3",
                       "4", "Strongly Present")
         )
+      ),
+      div(style="display: inline-block;vertical-align:top; width: 50px;",
+          numericInput(ns("select"), label = NULL, value = 1, min = 1) # starts at 0 due to observe event | bug
       )
     )
   )
@@ -313,25 +324,23 @@ label_altright_UI <- function(id){
 
 ### authentification
 googlesheets::gs_auth(token = "shiny_app_token.rds")
-# sheet_key <- "16kjt23nknV3ljsORwNon4n1I_BnI9BbilvoRj34ueV8"
-#with_label <- googlesheets::gs_key(sheet_key)
-
-with_label_id <- gs_title("altright_final")
+sheet_key <- "1qgJnrIkTDS539p5EbPtIF6cnptg2_-2G0Knavzxw3bw"
+with_label <- googlesheets::gs_key(sheet_key)
+with_label_id <- gs_title("altright_data_final")
 with_label_dat <- gs_read(with_label_id)
-# 
 # if_na <- function(x) ifelse(is.null(x), NA, x)
 
-
-label_altright <- function(input, output, session, user){
+label_altright <- function(input, output, session, gs_title, user){
   
   social_data <- reactive({
     input$refresh
-
-    no_label_id <- gs_title("dataset1")
+    #if(gs_title == "") { return(NULL) }
+    
+    no_label_id <- gs_title(gs_title)
     no_label <- gs_read(no_label_id)
 
     label_task <- no_label %>%
-      filter(!(id_label %in% with_label_dat$id_label))
+      filter(!(id %in% with_label_dat$id), !(text %in% with_label_dat$text))
 
     label_task_init <- data.frame(
       label_task,
@@ -350,9 +359,12 @@ label_altright <- function(input, output, session, user){
       coder = NA,
       timestamp = NA
     )
+    
+    num_finish <- nrow(no_label) - nrow(label_task)
 
     return(list(no_label = label_task_init,
-                with_label = with_label_dat))
+                with_label = with_label_dat, 
+                num_finish = num_finish))
   })
 
   ### need for reactive context
@@ -362,6 +374,11 @@ label_altright <- function(input, output, session, user){
     raw$dat <-  social_data()$no_label
   })
 
+  
+  output$counter <- renderText({
+    paste0("You coded ", (social_data()$num_finish + as.numeric(input$select) - 1))
+  })
+
   output$tweet <- renderText({
     raw$dat$text[input$select]
   })
@@ -369,52 +386,32 @@ label_altright <- function(input, output, session, user){
   # next button + summit + automatically go back to category 0
   observeEvent(input$submit, { # {|} works perfectly fine!
 
-    shinyjs::disable("submit")
     # update id number and starring
-    x <- input$select + 1
+    x <- as.numeric(input$select) + 1
     updateNumericInput(session, "select", value = x)
 
-    updateSliderTextInput(session, "identity", selected = "Not Present")
-    updateSliderTextInput(session, "moral", selected = "Not Present")
-    updateSliderTextInput(session, "elite", selected = "Not Present")
-    updateSliderTextInput(session, "left", selected = "Not Present")
+    updateSliderTextInput(session, "identity", selected = "1")
+    updateSliderTextInput(session, "moral", selected = "1")
+    updateSliderTextInput(session, "elite", selected = "1")
+    updateSliderTextInput(session, "left", selected = "1")
 
     updateAwesomeRadio(session, "lang", selected = "99")
     updateCheckboxGroupInput(session, "imm", selected = "99")
     updateCheckboxGroupInput(session, "vict", selected = "99")
     updateSwitchInput(session, "irony", value = F)
 
-    updateSliderTextInput(session, "anti_fem", selected  = "Not Present")
-    updateSliderTextInput(session, "race", selected = "Not Present")
-    updateSliderTextInput(session, "anti_sem", selected = "Not Present")
-    updateSliderTextInput(session, "anti_mus", selected = "Not Present")
-
-    shinyjs::enable("start")
-  })
-
-  # previous button
-  observeEvent(input$pre, {
-    x <- input$select - 1
-    updateNumericInput(session, "select", value = x)
-  })
-
-  # starring button
-  observeEvent(input$star, {
-    # extract index
-    isolate({
-      sel <- input$select
-    })
-
-    # (un-) starring
-    if(raw$dat$star[sel] %in% "1"){
-      raw$dat$star[sel] <- NA
-    } else {
-      raw$dat$star[sel] <- 1
-    }
+    updateSliderTextInput(session, "anti_fem", selected  = "1")
+    updateSliderTextInput(session, "race", selected = "1")
+    updateSliderTextInput(session, "anti_sem", selected = "1")
+    updateSliderTextInput(session, "anti_mus", selected = "1")
+    
   })
 
   # write into data frame
   observeEvent(input$submit, {  #observe
+    
+    shinyjs::disable("submit")
+    
     # isolates the reactive values without reactive dependecy.
     isolate({
       index <- input$select
@@ -431,7 +428,7 @@ label_altright <- function(input, output, session, user){
       anti_sem <- input$anti_sem
       elite <- input$elite
       anti_mus <- input$anti_mus
-      coder <- user()
+      coder <- user
     })
 
     raw$dat$identity[index] <- identity
@@ -452,6 +449,8 @@ label_altright <- function(input, output, session, user){
 
     with_label_id <- with_label_id %>%
       googlesheets::gs_add_row(input = raw$dat[index, ])
+    
+    shinyjs::enable("submit")
   })
 
   output$tab <- DT::renderDataTable({

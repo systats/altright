@@ -4,320 +4,320 @@ label_altright_UI <- function(id){
     useShinyjs(),
     #shinythemes::themeSelector(),
     column(width = 3,
-      div(class="ui blue segment",
-        div(class="ui huge blue top attached label", "1A. Rating"),
-        br(),
-        br(),
-        span(
-          strong("Focus on White Identity", style = "font-size: 15px;"),
-          div(
-            class = "small circular ui icon button",
-            `data-inverted` = "",
-            `data-tooltip` = "Text focuses on a collective white identity/race.",
-            `data-variation` = "wide",
-            `data-position` = "top left",
-            uiicon("help")
-          )
-        ),
-        sliderTextInput(
-          inputId = ns("identity"), 
-          label = NULL, 
-          grid = T, 
-          force_edges = T,
-          choices = c("Not Present",
-                      "2", "3", 
-                      "4", "Strongly Present")
-        ),
-        span(
-          strong("Lamenting about Moral Decline", style = "font-size: 15px;"),
-          div(
-            class = "small circular ui icon button",
-            `data-inverted` = "",
-            `data-tooltip` = 'Expressing a sentiment that morality is in decline (f.e. "degeneracy").',
-            `data-variation` = "wide",
-            `data-position` = "top left",
-            uiicon("help")
-          )
-        ),
-        sliderTextInput(
-          inputId = ns("moral"),
-          label = NULL,
-          grid = T,
-          force_edges = T,
-          choices = c("Not Present",
-                      "2", "3",
-                      "4", "Strongly Present")
-        ),
-        span(
-          strong("Anti-Elite and Conspiracies", style = "font-size: 15px;"),
-          div(
-            class = "small circular ui icon button",
-            `data-inverted` = "",
-            `data-tooltip` = "Expressing grievances over the Elite/Establishment/Mainstream Media/Culture",
-            `data-variation` = "wide",
-            `data-position` = "top left",
-            uiicon("help")
-          )
-        ),
-        sliderTextInput(
-          inputId = ns("elite"),
-          label = "",
-          grid = T,
-          force_edges = T,
-          choices = c("Not Present",
-                      "2", "3",
-                      "4", "Strongly Present")
-        ),
-        span(
-          strong("Anti-Left/Liberal Sentiment", style = "font-size: 15px;"),
-          div(
-            class = "small circular ui icon button",
-            `data-inverted` = "",
-            `data-tooltip` = "Negative sentiment towards liberals or “the Left” as a whole",
-            `data-variation` = "wide",
-            `data-position` = "top right",
-            uiicon("help")
-          )
-        ),
-        sliderTextInput(
-          inputId = ns("left"),
-          label = "",
-          grid = T,
-          force_edges = T,
-          choices = c("Not Present",
-                      "2", "3",
-                      "4", "Strongly Present")
-        )
-      )
+           div(class="ui blue segment",
+               div(class="ui huge blue top attached label", "1A. Rating"),
+               br(),
+               br(),
+               span(
+                 strong("Focus on White Identity", style = "font-size: 15px;"),
+                 div(
+                   class = "small circular ui icon button",
+                   `data-inverted` = "",
+                   `data-tooltip` = "Text focuses on a collective white identity/race.",
+                   `data-variation` = "wide",
+                   `data-position` = "top left",
+                   uiicon("help")
+                 )
+               ),
+               sliderTextInput(
+                 inputId = ns("identity"), 
+                 label = NULL, 
+                 grid = T, 
+                 force_edges = T,
+                 choices = c("Not Present",
+                             "2", "3", 
+                             "4", "Strongly Present")
+               ),
+               span(
+                 strong("Lamenting about Moral Decline", style = "font-size: 15px;"),
+                 div(
+                   class = "small circular ui icon button",
+                   `data-inverted` = "",
+                   `data-tooltip` = 'Expressing a sentiment that morality is in decline (f.e. "degeneracy").',
+                   `data-variation` = "wide",
+                   `data-position` = "top left",
+                   uiicon("help")
+                 )
+               ),
+               sliderTextInput(
+                 inputId = ns("moral"),
+                 label = NULL,
+                 grid = T,
+                 force_edges = T,
+                 choices = c("Not Present",
+                             "2", "3",
+                             "4", "Strongly Present")
+               ),
+               span(
+                 strong("Anti-Elite and Conspiracies", style = "font-size: 15px;"),
+                 div(
+                   class = "small circular ui icon button",
+                   `data-inverted` = "",
+                   `data-tooltip` = "Expressing grievances over the Elite/Establishment/Mainstream Media/Culture",
+                   `data-variation` = "wide",
+                   `data-position` = "top left",
+                   uiicon("help")
+                 )
+               ),
+               sliderTextInput(
+                 inputId = ns("elite"),
+                 label = "",
+                 grid = T,
+                 force_edges = T,
+                 choices = c("Not Present",
+                             "2", "3",
+                             "4", "Strongly Present")
+               ),
+               span(
+                 strong("Anti-Left/Liberal Sentiment", style = "font-size: 15px;"),
+                 div(
+                   class = "small circular ui icon button",
+                   `data-inverted` = "",
+                   `data-tooltip` = "Negative sentiment towards liberals or 'the Left' as a whole",
+                   `data-variation` = "wide",
+                   `data-position` = "top left",
+                   uiicon("help")
+                 )
+               ),
+               sliderTextInput(
+                 inputId = ns("left"),
+                 label = "",
+                 grid = T,
+                 force_edges = T,
+                 choices = c("Not Present",
+                             "2", "3",
+                             "4", "Strongly Present")
+               )
+           )
     ),
     column(width = 6,
-      div(class="ui segment",
-        div(class="ui huge orange top attached label", "Please rate this Comment:"),
-        #div(class="content", "Text:"
-        #   div(class="ui right aligned header", 
-        #     uiicon("twitter")
-        #   ),
-        #   h4(class="header",
-        #     "Mr X"
-        #   )
-        # ),
-        br(),
-        br(),
-        br(),
-        strong(#class="massive meta", 
-          textOutput(ns("tweet")), style = "font-size: 20px; color: black;"
-          #"Im sorry to say.. This is going to sound extremely racist, but without all the white influence in this world back then, if there were never white people, this whole world would suck and be uncivilized.", style = "font-size: 20px; color: black;" #uiOutput(ns("tw
-        )
-        # div(class="description", 
-        #  "Text ......."
-        # )
-        # div(class="extra content",
-        #   div(class="ui two buttons", 
-        #     div(class="ui basic green button", "Approve"),
-        #     div(class="ui basic red button", "Decline")
-        #   )
-        # )
-      ),
-      div(class = "ui three column grid", 
-        div(class="column",
-          br(),
-          span(
-            strong("1. Type of Language", style = "font-size: 15px;"), 
-            div(
-              class = "small circular ui icon button", 
-              `data-inverted` = "",
-              `data-tooltip` = "Please select only one.",
-              `data-variation` = "wide",
-              `data-position` = "top right",
-              uiicon("help")
-            )
-          ),
-          awesomeRadio(
-            inputId = ns("lang"), 
-            label = NULL, 
-            selected = "99",
-            choices = c(`Vulgar` = "1",
-                        `Hostile` = "2", 
-                        `Call for Violence` = "3",
-                        `None of the Above` = "99")
-          )
-        ),
-        div(class="column",
-          br(),
-          span(
-            strong("2. Anti-Immigration", style = "font-size: 15px;"), 
-            div(
-              class = "small circular ui icon button", 
-              `data-inverted` = "",
-              `data-tooltip` = "Please select one or more items.",
-              `data-variation` = "wide",
-              `data-position` = "top right",
-              uiicon("help")
-            )
-          ),
-          awesomeCheckboxGroup(
-            inputId = ns("imm"), 
-            label = NULL, 
-            selected = "99",
-            choices = c(`Illegal` = "1",
-                        `Non-Western (Culture)` = "2", 
-                        `Non-White (Race)` = "3",
-                        `None of the Above` = "99")
-          )
-        ),
-        div(class="column",
-          br(),
-          span(
-            strong("3. Victimization", style = "font-size: 15px;"), 
-            div(
-              class = "small circular ui icon button", 
-              `data-inverted` = "",
-              `data-tooltip` = "Please select one or more items.",
-              `data-variation` = "wide",
-              `data-position` = "top right",
-              uiicon("help")
-            )
-          ),
-          awesomeCheckboxGroup(
-            inputId = ns("vict"), 
-            label = "", 
-            selected = "99",
-            choices = c(`In General` = "1",
-                        `For being White` = "2", 
-                        `For being Male` = "3",
-                        `None of the Above` = "99")
-          )
-        )
-      ),
-      br(),
-      div(class = "ui two column grid",
-        div(class = "column",
-          br(),
-          span(
-            strong("4. Irony or Trolling", style = "font-size: 15px;"), 
-            div(
-              class = "small circular ui icon button", 
-              `data-inverted` = "",
-              `data-tooltip` = "Please Select",
-              `data-variation` = "wide",
-              `data-position` = "top right",
-              uiicon("help") 
-            )
-          ),
-          switchInput(
-            inputId = ns("irony"), 
-            value = F, 
-            label = "",
-            offStatus = "warning", 
-            onStatus = "success", 
-            offLabel = "No",
-            onLabel = "Yes"
-          )
-        ),
-        div(class = "right aligned column", 
-            br(),
-            br(),
-            div(style="float: right;width: 150px;",
-                actionButton(ns("submit"), label = "Submit", icon = icon("check"), style="color: #fff; background-color: green; border-color: #2e6da4")
-            ),
-            br(),
-            div(style="float: right;",
-              strong(textOutput(ns("counter")))
-            )
-        )
-      )
-      #progressBar(id = ns("pb"), value = 1, status = "success")
+           div(class="ui segment",
+               div(class="ui huge orange top attached label", "Please rate this Comment:"),
+               #div(class="content", "Text:"
+               #   div(class="ui right aligned header", 
+               #     uiicon("twitter")
+               #   ),
+               #   h4(class="header",
+               #     "Mr X"
+               #   )
+               # ),
+               br(),
+               br(),
+               br(),
+               strong(#class="massive meta", 
+                 textOutput(ns("tweet")), style = "font-size: 20px; color: black;"
+                 #"Im sorry to say.. This is going to sound extremely racist, but without all the white influence in this world back then, if there were never white people, this whole world would suck and be uncivilized.", style = "font-size: 20px; color: black;" #uiOutput(ns("tw
+               )
+               # div(class="description", 
+               #  "Text ......."
+               # )
+               # div(class="extra content",
+               #   div(class="ui two buttons", 
+               #     div(class="ui basic green button", "Approve"),
+               #     div(class="ui basic red button", "Decline")
+               #   )
+               # )
+           ),
+           div(class = "ui three column grid", 
+               div(class="column",
+                   br(),
+                   span(
+                     strong("1. Type of Language", style = "font-size: 15px;"), 
+                     div(
+                       class = "small circular ui icon button", 
+                       `data-inverted` = "",
+                       `data-tooltip` = "Please select only one. The priority goes Vulgar < Hostile < Call for Violence.",
+                       `data-variation` = "wide",
+                       `data-position` = "top left",
+                       uiicon("help")
+                     )
+                   ),
+                   awesomeRadio(
+                     inputId = ns("lang"), 
+                     label = NULL, 
+                     selected = "99",
+                     choices = c(`Vulgar` = "1",
+                                 `Hostile` = "2", 
+                                 `Call for Violence` = "3",
+                                 `None of the Above` = "99")
+                   )
+               ),
+               div(class="column",
+                   br(),
+                   span(
+                     strong("2. Anti-Immigration", style = "font-size: 15px;"), 
+                     div(
+                       class = "small circular ui icon button", 
+                       `data-inverted` = "",
+                       `data-tooltip` = "Please select one or more items.",
+                       `data-variation` = "wide",
+                       `data-position` = "top right",
+                       uiicon("help")
+                     )
+                   ),
+                   awesomeCheckboxGroup(
+                     inputId = ns("imm"), 
+                     label = NULL, 
+                     selected = "99",
+                     choices = c(`Illegal` = "1",
+                                 `Non-Western (Culture)` = "2", 
+                                 `Non-White (Race)` = "3",
+                                 `None of the Above` = "99")
+                   )
+               ),
+               div(class="column",
+                   br(),
+                   span(
+                     strong("3. Victimization", style = "font-size: 15px;"), 
+                     div(
+                       class = "small circular ui icon button", 
+                       `data-inverted` = "",
+                       `data-tooltip` = "Please select one or more items.",
+                       `data-variation` = "wide",
+                       `data-position` = "top right",
+                       uiicon("help")
+                     )
+                   ),
+                   awesomeCheckboxGroup(
+                     inputId = ns("vict"), 
+                     label = "", 
+                     selected = "99",
+                     choices = c(`In General` = "1",
+                                 `For being White` = "2", 
+                                 `For being Male` = "3",
+                                 `None of the Above` = "99")
+                   )
+               )
+           ),
+           br(),
+           div(class = "ui two column grid",
+               div(class = "column",
+                   br(),
+                   span(
+                     strong("4. Irony or Trolling", style = "font-size: 15px;"), 
+                     div(
+                       class = "small circular ui icon button", 
+                       `data-inverted` = "",
+                       `data-tooltip` = "Please Select",
+                       `data-variation` = "wide",
+                       `data-position` = "top right",
+                       uiicon("help") 
+                     )
+                   ),
+                   switchInput(
+                     inputId = ns("irony"), 
+                     value = F, 
+                     label = "",
+                     offStatus = "warning", 
+                     onStatus = "success", 
+                     offLabel = "No",
+                     onLabel = "Yes"
+                   )
+               ),
+               div(class = "right aligned column", 
+                   br(),
+                   br(),
+                   div(style="float: right;width: 150px;",
+                       actionButton(ns("submit"), label = "Submit", icon = icon("check"), style="color: #fff; background-color: green; border-color: #2e6da4")
+                   ),
+                   br(),
+                   div(style="float: right;",
+                       strong(textOutput(ns("counter")))
+                   )
+               )
+           )
+           #progressBar(id = ns("pb"), value = 1, status = "success")
     ),
     # bhvhv
     column(width = 3,
-      div(class="ui blue segment",
-        div(class="ui huge blue top attached label", "1B. Rating"),
-        br(),
-        br(),
-        span(
-          strong("Misogyny and Anti-Feminism", style = "font-size: 15px;"),
-          div(
-            class = "small circular ui icon button",
-            `data-inverted` = "",
-            `data-tooltip` = "Expressing anti-women sentiments, endorsing male dominance.",
-            `data-variation` = "wide",
-            `data-position` = "top right",
-            uiicon("help")
-          )
-        ),
-        sliderTextInput(
-          inputId = ns("anti_fem"), 
-          label = NULL, 
-          grid = T, 
-          force_edges = T,
-          choices = c("Not Present",
-                      "2", "3", 
-                      "4", "Strongly Present")
-        ),
-        span(
-          strong("Racism", style = "font-size: 15px;"),
-          div(
-            class = "small circular ui icon button",
-            `data-inverted` = "",
-            `data-tooltip` = "Expressing a bias/hatred against people of a certain race.",
-            `data-variation` = "wide",
-            `data-position` = "top right",
-            uiicon("help")
-          )
-        ),
-        sliderTextInput(
-          inputId = ns("race"),
-          label = "",
-          grid = TRUE,
-          force_edges = TRUE,
-          choices = c("Not Present",
-                      "2", "3",
-                      "4", "Strongly Present")
-        ),
-        span(
-          strong("Anti-Semitism", style = "font-size: 15px;"),
-          div(
-            class = "small circular ui icon button",
-            `data-inverted` = "",
-            `data-tooltip` = "Expressing a bias/hatred against Jewish people.",
-            `data-variation` = "wide",
-            `data-position` = "top right",
-            uiicon("help")
-          )
-        ),
-        sliderTextInput(
-          inputId = ns("anti_sem"),
-          label = "",
-          grid = T,
-          force_edges = T,
-          choices = c("Not Present",
-                      "2", "3",
-                      "4", "Strongly Present")
-        ),
-        span(
-          strong("Anti-Muslim Sentiment", style = "font-size: 15px;"),
-          div(
-            class = "small circular ui icon button",
-            `data-inverted` = "",
-            `data-tooltip` = "Expressing grievances over the Elite/Establishment/Mainstream Media/Culture",
-            `data-variation` = "wide",
-            `data-position` = "top right",
-            uiicon("help")
-          )
-        ),
-        sliderTextInput(
-          inputId = ns("anti_mus"),
-          label = NULL,
-          grid = T,
-          force_edges = T,
-          choices = c("Not Present",
-                      "2", "3",
-                      "4", "Strongly Present")
-        )
-      ),
-      div(style="display: inline-block;vertical-align:top; width: 50px;",
-          numericInput(ns("select"), label = NULL, value = 1, min = 1) # starts at 0 due to observe event | bug
-      )
+           div(class="ui blue segment",
+               div(class="ui huge blue top attached label", "1B. Rating"),
+               br(),
+               br(),
+               span(
+                 strong("Misogyny and Anti-Feminism", style = "font-size: 15px;"),
+                 div(
+                   class = "small circular ui icon button",
+                   `data-inverted` = "",
+                   `data-tooltip` = "Expressing anti-women or anti-Feminist sentiments.",
+                   `data-variation` = "wide",
+                   `data-position` = "top right",
+                   uiicon("help")
+                 )
+               ),
+               sliderTextInput(
+                 inputId = ns("anti_fem"), 
+                 label = NULL, 
+                 grid = T, 
+                 force_edges = T,
+                 choices = c("Not Present",
+                             "2", "3", 
+                             "4", "Strongly Present")
+               ),
+               span(
+                 strong("Racism", style = "font-size: 15px;"),
+                 div(
+                   class = "small circular ui icon button",
+                   `data-inverted` = "",
+                   `data-tooltip` = "Expressing a bias/hatred against people of a certain race.",
+                   `data-variation` = "wide",
+                   `data-position` = "top right",
+                   uiicon("help")
+                 )
+               ),
+               sliderTextInput(
+                 inputId = ns("race"),
+                 label = "",
+                 grid = TRUE,
+                 force_edges = TRUE,
+                 choices = c("Not Present",
+                             "2", "3",
+                             "4", "Strongly Present")
+               ),
+               span(
+                 strong("Anti-Semitism", style = "font-size: 15px;"),
+                 div(
+                   class = "small circular ui icon button",
+                   `data-inverted` = "",
+                   `data-tooltip` = "Expressing a bias/hatred against Jewish people.",
+                   `data-variation` = "wide",
+                   `data-position` = "top right",
+                   uiicon("help")
+                 )
+               ),
+               sliderTextInput(
+                 inputId = ns("anti_sem"),
+                 label = "",
+                 grid = T,
+                 force_edges = T,
+                 choices = c("Not Present",
+                             "2", "3",
+                             "4", "Strongly Present")
+               ),
+               span(
+                 strong("Anti-Muslim Sentiment", style = "font-size: 15px;"),
+                 div(
+                   class = "small circular ui icon button",
+                   `data-inverted` = "",
+                   `data-tooltip` = "Expressing a bias/hatred against Muslims.",
+                   `data-variation` = "wide",
+                   `data-position` = "top right",
+                   uiicon("help")
+                 )
+               ),
+               sliderTextInput(
+                 inputId = ns("anti_mus"),
+                 label = NULL,
+                 grid = T,
+                 force_edges = T,
+                 choices = c("Not Present",
+                             "2", "3",
+                             "4", "Strongly Present")
+               )
+           ),
+           div(style="display: inline-block;vertical-align:top; width: 50px;",
+               numericInput(ns("select"), label = NULL, value = 1, min = 1) # starts at 0 due to observe event | bug
+           )
     )
   )
 }

@@ -66,6 +66,7 @@ ui_content <- function(){
   )
 }
 
+
 server <- function(input, output, session) {
   
   ### login part 
@@ -96,6 +97,7 @@ server <- function(input, output, session) {
         user = client$data$user
       )
     }
+    
   })
   
   ### leader board

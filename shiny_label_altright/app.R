@@ -23,10 +23,10 @@ library(formattable)
 library(DT)
 library(stringr)
 
-source("mods/helper.R")
-source("mods/label_altright_mod.R")
-source("mods/leaderboard_mod.R")
+#source("mods/helper.R")
 source("mods/login_mod.R")
+source("mods/leaderboard_mod.R")
+source("mods/label_altright_mod.R")
 
 ui <- shinyUI(
   fluidPage(
@@ -42,7 +42,6 @@ ui_content <- function(){
     ), 
     windowTitle = "Decoding the Alt-Right", 
     theme = shinythemes::shinytheme("yeti"), # sandstone, united, paper, flatly, cosmo
-    #inputs = logout_button(),
     tabPanel(
       "Start", 
       tags$iframe(src = 'startingpage.html', # put testdoc.html to /www
@@ -77,8 +76,6 @@ server <- function(input, output, session) {
     client$data <- callModule(login_mod, id = "pre")
   }) 
   
-  # logout process (bsolete since refresh...)
-  
   # output log in tab database
   output$log <- renderPrint({
     client$data
@@ -86,10 +83,15 @@ server <- function(input, output, session) {
   
   ### sentiment labeling
   observeEvent(client$data$log, {
+    
+    with_label_id <- gs_title("altright_data_final")
+    with_label_dat <- gs_read(with_label_id)
+    
     if(client$data$log){
       callModule(
         label_altright,
         id = "task",
+        data = with_label_dat,
         gs_title = client$data$dlink,
         user = client$data$user
       )

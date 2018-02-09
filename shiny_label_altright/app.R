@@ -21,6 +21,7 @@ library(googlesheets)
 library(highcharter)
 library(formattable)
 library(DT)
+library(stringr)
 
 source("mods/helper.R")
 #source("mods/instructions_mod.R")

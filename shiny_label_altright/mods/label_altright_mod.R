@@ -348,7 +348,8 @@ label_altright <- function(input, output, session, gs_title, user){
       select(id, text)
     
     label_task <- no_label %>% 
-        anti_join(user_dat, by = c("id", "text"))
+      anti_join(user_dat, by = c("id", "text")) %>%
+      filter(!duplicated(text))
     
     #dplyr::filter(!id_label %in% user_dat$id_label)
     #no_label[!stringr::str_detect(no_label$id, paste(user_dat$id, collapse = "|")), ]

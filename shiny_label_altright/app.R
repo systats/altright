@@ -35,15 +35,14 @@ ui <- shinyUI(
 )
 
 ui_content <- function(){
-  navbarPageWithInputs(
-    #shinyjs::useShinyjs(),
+  navbarPage(
     title = span(
       icon("flag", "fa-1x"), 
       "Decoding the Alt-Right"
     ), 
     windowTitle = "Decoding the Alt-Right", 
     theme = shinythemes::shinytheme("yeti"), # sandstone, united, paper, flatly, cosmo
-    inputs = logout_button(),
+    #inputs = logout_button(),
     tabPanel(
       "Start", 
       tags$iframe(src = 'startingpage.html', # put testdoc.html to /www
@@ -64,9 +63,6 @@ ui_content <- function(){
       span(icon("trophy"), "Leaderboard"), 
       leaderboard_UI("winner")
     )
-    # tabPanel(span(icon("database"), "Corpus"), 
-    #          ""
-    # )
     #shinythemes::themeSelector()
   )
 }
@@ -81,10 +77,7 @@ server <- function(input, output, session) {
     client$data <- callModule(login_mod, id = "pre")
   }) 
   
-  # # logout process (bsolete since refresh...)
-  # observeEvent(input$refresh, { 
-  #   client$data$log <- F
-  # })
+  # logout process (bsolete since refresh...)
   
   # output log in tab database
   output$log <- renderPrint({
@@ -111,9 +104,10 @@ server <- function(input, output, session) {
     )
   })
   
-  observeEvent(input$refresh, {
-    js$refresh();
-  })
+  # observeEvent(input$refresh, {
+  #   client$data$log <- F
+  #   js$refresh()
+  # })
   
   ### UI output handler
   output$main <- renderUI({

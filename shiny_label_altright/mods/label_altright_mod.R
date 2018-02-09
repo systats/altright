@@ -326,6 +326,7 @@ label_altright_UI <- function(id){
 googlesheets::gs_auth(token = "shiny_app_token.rds")
 sheet_key <- "1qgJnrIkTDS539p5EbPtIF6cnptg2_-2G0Knavzxw3bw"
 with_label <- googlesheets::gs_key(sheet_key)
+
 with_label_id <- gs_title("altright_data_final")
 with_label_dat <- gs_read(with_label_id)
 # if_na <- function(x) ifelse(is.null(x), NA, x)
@@ -339,8 +340,14 @@ label_altright <- function(input, output, session, gs_title, user){
     no_label_id <- gs_title(gs_title)
     no_label <- gs_read(no_label_id)
 
+    user_label <- with_label_dat %>%
+      filter(coder == user)
+    
     label_task <- no_label %>%
-      filter(!(id %in% with_label_dat$id), !(text %in% with_label_dat$text))
+      filter(
+        !(id %in% user_label$id), 
+        !(text %in% user_label$text)
+      )
 
     label_task_init <- data.frame(
       label_task,
@@ -360,10 +367,10 @@ label_altright <- function(input, output, session, gs_title, user){
       timestamp = NA
     )
     
-    num_finish <- nrow(no_label) - nrow(label_task)
+    num_finish <- nrow(user_label)
 
     return(list(no_label = label_task_init,
-                with_label = with_label_dat, 
+                with_label = user_label, 
                 num_finish = num_finish))
   })
 
@@ -447,7 +454,7 @@ label_altright <- function(input, output, session, gs_title, user){
     raw$dat$coder[index] <- coder
     raw$dat$timestamp[index] <- Sys.time() %>% as.character()
 
-    with_label_id <- with_label_id %>%
+    with_label_id <- with_label %>%
       googlesheets::gs_add_row(input = raw$dat[index, ])
     
     shinyjs::enable("submit")

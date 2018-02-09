@@ -327,29 +327,33 @@ googlesheets::gs_auth(token = "shiny_app_token.rds")
 sheet_key <- "1qgJnrIkTDS539p5EbPtIF6cnptg2_-2G0Knavzxw3bw"
 with_label <- googlesheets::gs_key(sheet_key)
 
-with_label_id <- gs_title("altright_data_final")
-with_label_dat <- gs_read(with_label_id)
 # if_na <- function(x) ifelse(is.null(x), NA, x)
 
 label_altright <- function(input, output, session, gs_title, user){
   
+  
+  # start new login in session with 1
+  #updateNumericInput(session, "select", value = 1)
+  #shinyjs::reset("select")
   
   coder <- reactive({ user })
   
   social_data <- reactive({
     input$refresh
     #if(gs_title == "") { return(NULL) }
+    with_label_id <- gs_title("altright_data_final")
+    with_label_dat <- gs_read(with_label_id)
     
     no_label_id <- gs_title(gs_title)
     no_label <- gs_read(no_label_id)
     
     user_dat <- with_label_dat %>% 
       dplyr::filter(coder == coder()) %>%
-      select(id, text)
+      dplyr::filter(!duplicated(text)) %>%
+      dplyr::select(id, text)
     
     label_task <- no_label %>% 
-      anti_join(user_dat, by = c("id", "text")) %>%
-      filter(!duplicated(text))
+      dplyr::anti_join(user_dat, by = c("id", "text"))
     
     #dplyr::filter(!id_label %in% user_dat$id_label)
     #no_label[!stringr::str_detect(no_label$id, paste(user_dat$id, collapse = "|")), ]

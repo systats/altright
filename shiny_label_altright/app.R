@@ -24,7 +24,6 @@ library(DT)
 library(stringr)
 
 source("mods/helper.R")
-#source("mods/instructions_mod.R")
 source("mods/label_altright_mod.R")
 source("mods/leaderboard_mod.R")
 source("mods/login_mod.R")
@@ -82,10 +81,10 @@ server <- function(input, output, session) {
     client$data <- callModule(login_mod, id = "pre")
   }) 
   
-  # logout process
-  observeEvent(input$logout, { 
-    client$data$log <- F
-  })
+  # # logout process (bsolete since refresh...)
+  # observeEvent(input$refresh, { 
+  #   client$data$log <- F
+  # })
   
   # output log in tab database
   output$log <- renderPrint({
@@ -112,13 +111,9 @@ server <- function(input, output, session) {
     )
   })
   
-  # ### datastore board
-  # observe({
-  #   callModule(
-  #     database,
-  #     id = "data"
-  #   )
-  # })
+  observeEvent(input$refresh, {
+    js$refresh();
+  })
   
   ### UI output handler
   output$main <- renderUI({
@@ -131,6 +126,3 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
-
-
-

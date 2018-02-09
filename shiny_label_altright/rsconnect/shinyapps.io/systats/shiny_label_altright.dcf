@@ -5,9 +5,9 @@ account: systats
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 273545
-bundleId: 1213769
+bundleId: 1215284
 url: https://systats.shinyapps.io/shiny_label_altright/
-when: 1518103346.47204
+when: 1518186711.37349
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: .httr-oauth|comps.nb.html|comps.Rmd|dataset1.Rdata|df_list.Rdata|small_keys.Rdata|Untitled.md|upload.nb.html|upload.Rmd

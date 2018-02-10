@@ -27,6 +27,13 @@ The following section includes the instructions on how to code the comments and 
 
 ## **1. Type of Language**
 
+
+Please select only one of the following options for the type of language.
+
+**Note:** The priority goes Vulgar < Hostile < Call for Violence
+
+So if there is Hostile and Vulgar Language present, please code Hostile Language. If there is a Call for Violence present, that trumps all other options in priority.
+
 <center>
   <img src="images/type_of_language.png" width = "30%">
 </center>

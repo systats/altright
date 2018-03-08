@@ -20,8 +20,10 @@ googlesheets::gs_auth(token = "shiny_app_token.rds")
 
 
 ```{r}
-with_label_id <- gs_title("altright_data_final")
-alright_label <- gs_read(with_label_id)
+with_label <- gs_title("altright_data_final") %>%
+  gs_read()
+
+#save(with_label, file = "altright_with_label.Rdata")
 ```
 
 
@@ -65,7 +67,7 @@ kappa2(df_coder_wide[2:90, ])
 ```{r}
 kappas <- c()
 for (jj in 1:nrow(df_coder_wide)) {
-  kappas[jj] <- kappa2(df_coder_wide[jj:90, ])$value
+  kappas[jj] <- kappa2(df_coder_wide[1:jj, ])$value
 }
 
 data.frame(kappa = kappas, item = 1:length(kappas)) %>%
@@ -87,12 +89,12 @@ get_kappa <- function(data, var = "race", coders = c("Tobit", "startimeash")){
     filter(coder %in% coders) %>%
     #mutate(target = ifelse(target > 1, 1, 0)) %>%
     tidyr::spread("coder", "target") %>%
-    select(-id_label, -target) %>%
+    select(-id_label) %>%
     na.omit()
   
   kappas <- c()
   for (jj in 1:nrow(wide)) {
-    kappas[jj] <- kappa2(wide[jj:90, ])$value
+    kappas[jj] <- kappa2(wide[1:jj, ])$value
   }
 
   return(data.frame(kappa = kappas, item = 1:length(kappas), var = var))
@@ -201,6 +203,20 @@ gg_sdv <- plot_data1 %>%
     facet_wrap(~var, ncol = 1)
 
 ggsave(gg_sdv, file = "gg_sdv.png", width = 8, height = 15)
+```
+
+
+## Individual 
+
+```{r}
+df_coder %>%
+  select(race, coder) %>%
+  group_by(coder) %>%
+  mutate(id = 1:n()) %>%
+  ungroup %>%
+  mutate(race = race -1) %>%
+  ggplot(aes(id, race, colour = coder)) +
+    geom_line(position = position_dodge(), alpha = .5)
 ```
 
 
